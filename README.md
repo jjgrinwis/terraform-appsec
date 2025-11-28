@@ -112,6 +112,22 @@ check "validate_no_duplicate_policy_assignments" {
 }
 ```
 
+#### 3. Conflicting Management Check
+
+```hcl
+check "validate_no_conflicting_managed_hosts" {
+  # Ensures a hostname is not in both tfe_outputs AND non_tf_managed_hosts
+}
+```
+
+#### 4. Non-TF Managed Hosts Validation
+
+```hcl
+check "validate_non_tf_managed_hosts" {
+  # Ensures non-TF managed hostnames are active/selectable in Akamai
+}
+```
+
 ## Prerequisites
 
 - **Terraform**: >= 1.5.0 (for import functionality)
@@ -277,10 +293,10 @@ The module will automatically switch from mock data to fetching real outputs fro
 
 ## Outputs
 
-| Output                           | Description                                                   |
-| -------------------------------- | ------------------------------------------------------------- |
-| `hostnames_by_policy`            | Map of security policies to their assigned hostnames          |
-| `duplicate_hostname_assignments` | Any hostnames assigned to multiple policies (should be empty) |
+| Output                      | Description                                          |
+| --------------------------- | ---------------------------------------------------- |
+| `hostnames_by_policy`       | Map of security policies to their assigned hostnames |
+| `security_config_hostnames` | All hostnames assigned to the security configuration |
 
 ### Example Output
 
@@ -291,7 +307,13 @@ hostnames_by_policy = {
   "low"    = ["dev.example.com"]
 }
 
-duplicate_hostname_assignments = {}
+security_config_hostnames = [
+  "www.example.com",
+  "api.example.com",
+  "staging.example.com",
+  "dev.example.com",
+  "legacy.example.com"  # non-TF managed host
+]
 ```
 
 ## How It Works
@@ -349,9 +371,23 @@ Terraform will validate the configuration before applying:
   ```
 
 - **Duplicate Assignments**: Hostnames assigned to multiple policies will be rejected
+
   ```
   Error: The following hostnames are assigned to multiple security policies:
          example.com (low, medium)
+  ```
+
+- **Conflicting Management**: Hostnames in both tfe_outputs and non_tf_managed_hosts will be rejected
+
+  ```
+  Error: The following hostnames exist in both non_tf_managed_hosts and tfe_outputs.
+         A hostname cannot be both managed and non-managed: example.com
+  ```
+
+- **Invalid Non-TF Managed Hosts**: Non-TF managed hostnames that are not active in Akamai will be rejected
+  ```
+  Error: The following non-TF managed hostnames are not active/selectable in Akamai:
+         invalid.example.com
   ```
 
 ### Post-Apply Verification
@@ -360,7 +396,7 @@ Check outputs after applying:
 
 ```bash
 terraform output hostnames_by_policy
-terraform output duplicate_hostname_assignments
+terraform output security_config_hostnames
 ```
 
 ## Troubleshooting
