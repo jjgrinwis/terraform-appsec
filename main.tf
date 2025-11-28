@@ -103,6 +103,20 @@ locals {
     hostname => distinct(policies)
     if length(distinct(policies)) > 1
   }
+
+  # Find hostnames that exist in both non_tf_managed_hosts and tfe_outputs
+  # A hostname should be either managed by Terraform OR not managed, not both
+  conflicting_managed_hosts = [
+    for hostname in var.non_tf_managed_hosts :
+    hostname if contains(local.all_requested_hostnames, hostname)
+  ]
+
+  # Find non-TF managed hostnames that are NOT in the selectable hostnames list
+  # These hostnames cannot be added to the security configuration
+  invalid_non_tf_managed_hosts = [
+    for hostname in var.non_tf_managed_hosts :
+    hostname if !contains(local.selectable_hostnames, hostname)
+  ]
 }
 
 # Validation check to ensure all requested hostnames are active in Akamai
@@ -119,6 +133,24 @@ check "validate_no_duplicate_policy_assignments" {
   assert {
     condition     = length(local.duplicate_hostname_assignments) == 0
     error_message = "The following hostnames are assigned to multiple security policies: ${join(", ", [for hostname, policies in local.duplicate_hostname_assignments : "${hostname} (${join(", ", policies)})"])}"
+  }
+}
+
+# Validation check to ensure non-TF managed hosts don't conflict with TF managed hosts
+# A hostname should be either managed by Terraform (in tfe_outputs) OR not managed (in non_tf_managed_hosts), not both
+check "validate_no_conflicting_managed_hosts" {
+  assert {
+    condition     = length(local.conflicting_managed_hosts) == 0
+    error_message = "The following hostnames exist in both non_tf_managed_hosts and tfe_outputs. A hostname cannot be both managed and non-managed: ${join(", ", local.conflicting_managed_hosts)}"
+  }
+}
+
+# Validation check to ensure non-TF managed hosts are active/selectable in Akamai
+# Non-TF managed hosts must also be valid hostnames that can be added to the security configuration
+check "validate_non_tf_managed_hosts" {
+  assert {
+    condition     = length(local.invalid_non_tf_managed_hosts) == 0
+    error_message = "The following non-TF managed hostnames are not active/selectable in Akamai: ${join(", ", local.invalid_non_tf_managed_hosts)}"
   }
 }
 

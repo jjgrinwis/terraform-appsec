@@ -2,8 +2,8 @@
 # Copy this file to terraform.tfvars and update with your values
 
 # Akamai Security Configuration
-security_config_name = "jgrinwis-sc"
-group_name           = "Akamai Demo-M-1YX7F61"
+security_config_name = "security-config-name"
+group_name           = "group-name"
 
 # Security Policy IDs (get these from Akamai Control Center)
 security_policy_low    = "ewcr_207932"
@@ -11,7 +11,8 @@ security_policy_medium = "6666_76098"
 security_policy_high   = "0000_68583"
 
 # Non-Terraform managed hostnames (hostnames in the security config not managed by TF)
-non_tf_managed_hosts = ["ew.grinwis.com"]
+# Hostnames will be removed from the Security Configuration if not in this list and not managed by Terraform!
+non_tf_managed_hosts = ["ignore.example.com"]
 
 # Data Source Configuration
 # Set to true for testing with mock data, false for production with Terraform Cloud

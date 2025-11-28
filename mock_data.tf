@@ -8,13 +8,13 @@ locals {
     "property-1" = {
       nonsensitive_values = {
         security_policy = "low"
-        hostnames       = ["ew.grinwis.com"]
+        hostnames       = ["ew.grinwis.com", "bms.grinwis.com"]
       }
     }
     "property-2" = {
       nonsensitive_values = {
         security_policy = "medium"
-        hostnames       = ["wss.grinwis.com", "bms.grinwis.com"]
+        hostnames       = ["wss.grinwis.com"]
       }
     }
     "property-3" = {
