@@ -1,0 +1,125 @@
+formatter: "markdown table"
+
+version: ""
+
+header-from: main.tf
+
+sections:
+  show:
+    - header
+    - requirements
+    - providers
+    - inputs
+    - outputs
+    - resources
+    - modules
+  hide: []
+
+content: |-
+  {{ .Header }}
+
+  ## Features
+
+  - **Dynamic Policy Assignment**: Automatically assigns hostnames to low, medium, or high security policies
+  - **Hostname Validation**: Ensures all requested hostnames are active and available in Akamai
+  - **Duplicate Prevention**: Prevents a hostname from being assigned to multiple security policies
+  - **Mixed Management**: Supports both Terraform-managed and manually-managed hostnames
+
+  ## Usage
+
+  ### Basic Example
+
+  ```hcl
+  # Create terraform.tfvars with your configuration
+  security_config_name   = "my-security-config"
+  group_name            = "My Akamai Group"
+  security_policy_low    = "low_12345"
+  security_policy_medium = "med_67890"
+  security_policy_high   = "high_11111"
+
+  # Use mock data for testing (default)
+  use_mock_data = true
+  ```
+
+  ### Production Example with Terraform Cloud
+
+  ```hcl
+  # terraform.tfvars
+  security_config_name   = "production-security-config"
+  group_name            = "Production Group"
+  security_policy_low    = "prod_low_12345"
+  security_policy_medium = "prod_med_67890"
+  security_policy_high   = "prod_high_11111"
+
+  # Use real TFE outputs
+  use_mock_data    = false
+  tfe_organization = "my-organization"
+  tfe_workspace    = "my-workspace"
+  ```
+
+  ## Requirements
+
+  {{ .Requirements }}
+
+  ## Providers
+
+  {{ .Providers }}
+
+  ## Resources
+
+  {{ .Resources }}
+
+  ## Inputs
+
+  {{ .Inputs }}
+
+  ## Outputs
+
+  {{ .Outputs }}
+
+  ## Validation Checks
+
+  The module includes built-in validation checks:
+
+  1. **Hostname Availability**: All requested hostnames must be active in Akamai
+  2. **No Duplicate Assignments**: Hostnames cannot be assigned to multiple policies
+  3. **Policy ID Format**: Security policy IDs must match the pattern `prefix_number`
+  4. **TFE Configuration**: When not using mock data, TFE organization and workspace must be set
+
+  ## Important Notes
+
+  - The security configuration resource has `prevent_destroy = true` to protect against accidental deletion
+  - After first successful `terraform apply`, remove the import block (lines 129-132 in main.tf)
+  - Match targets are created dynamically based on hostname assignments
+  - Empty policies (no hostnames) won't create match targets to avoid catch-all behavior
+
+output:
+  file: ""
+  mode: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+
+output-values:
+  enabled: false
+  from: ""
+
+sort:
+  enabled: true
+  by: name
+
+settings:
+  anchor: true
+  color: true
+  default: true
+  description: false
+  escape: true
+  hide-empty: false
+  html: true
+  indent: 2
+  lockfile: true
+  read-comments: true
+  required: true
+  sensitive: true
+  type: true
