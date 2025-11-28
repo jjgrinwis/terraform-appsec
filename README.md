@@ -5,7 +5,7 @@ A Terraform module for managing Akamai Application Security (AppSec) configurati
 ## Overview
 
 A lot of customers just want to manage the security settings in Akamai Control Center.
-They don't want to manage WAF exceptions or custom rules as code, they just want to click to buttons. But when adding a property via Terraform, they would like automatically add that to a security policy. This Terraform module will use a single source of truth like Terraform Cloud and use that as the source to update the hostname to security policy mapping in a security configuration.
+They don't want to manage WAF exceptions or custom rules as code, they just want to click some buttons. But when adding a property via Terraform, they would like automatically add that to a security policy. This Terraform module will use a single source of truth like Terraform Cloud and use that as the source to update the hostname to security policy mapping in a security configuration.
 
 This module provides automated management of Akamai AppSec configurations, including:
 
