@@ -28,6 +28,7 @@ This module provides automated management of Akamai AppSec configurations, inclu
 - Security policies and their IDs (configured in Akamai Control Center)
 - WAF rules, rate limiting, and other security settings
 - Other match targets that may exist outside these three
+- Make sure to add non-TF managed hosts to the `non_tf_managed_hosts` list
 
 **Data Source:** This module expects hostname-to-policy mappings from any Infrastructure as Code (IaC) management platform:
 
